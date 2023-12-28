@@ -4,16 +4,16 @@ import imgUrl from './assets/images/main.jpg'
 
 const STORAGE_KEY = 'vue-todomvc'
 
-// const filters = {
-//   all: (todos) => todos,
-//   active: (todos) => todos.filter((todo) => !todo.completed),
-//   completed: (todos) => todos.filter((todo) => todo.completed)
-// }
+const filters = {
+  all: (todos) => todos,
+  active: (todos) => todos.filter((todo) => !todo.completed),
+  completed: (todos) => todos.filter((todo) => todo.completed)
+}
 
 // state
 const todos = ref(JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'))
-// const visibility = ref('all')
-// const editedTodo = ref()
+const visibility = ref('all')
+const editedTodo = ref()
 
 // derived state
 const filteredTodos = computed(() => filters[visibility.value](todos.value))
@@ -21,7 +21,7 @@ const remaining = computed(() => filters.active(todos.value).length)
 
 // handle routing
 window.addEventListener('hashchange', onHashChange)
-// onHashChange()
+onHashChange()
 
 // persist state
 watchEffect(() => {
@@ -44,9 +44,9 @@ function addTodo(e) {
   }
 }
 
-// function removeTodo(todo) {
-//   todos.value.splice(todos.value.indexOf(todo), 1)
-// }
+function removeTodo(todo) {
+  todos.value.splice(todos.value.indexOf(todo), 1)
+}
 
 let beforeEditCache = ''
 function editTodo(todo) {
@@ -95,15 +95,16 @@ function onHashChange() {
         @keyup.enter="addTodo"
       >
     </header>
-    <section class="main" >
+    <section class="main" v-show="todos.length">
       <input
         id="toggle-all"
         class="toggle-all"
         type="checkbox"
-       
+        :checked="remaining === 0"
+        @change="toggleAll"
       >
       <label for="toggle-all">Mark all as complete</label>
-   <!--    <ul class="todo-list">
+      <ul class="todo-list">
         <li
           v-for="todo in filteredTodos"
           class="todo"
@@ -126,9 +127,9 @@ function onHashChange() {
             @keyup.escape="cancelEdit(todo)"
           >
         </li>
-      </ul>-->
+      </ul>
     </section>
-    <!-- <footer class="footer" v-show="todos.length">
+    <footer class="footer" v-show="todos.length">
       <span class="todo-count">
         <strong>{{ remaining }}</strong>
         <span>{{ remaining === 1 ? ' item' : ' items' }} left</span>
@@ -145,9 +146,9 @@ function onHashChange() {
         </li>
       </ul>
       <button class="clear-completed" @click="removeCompleted" v-show="todos.length > remaining">
-        Clear completed
+        Clear All
       </button>
-    </footer>  -->
+    </footer>
     </div>
   </section>
 </template>
@@ -159,8 +160,6 @@ function onHashChange() {
 *:after {
     box-sizing: border-box;
     font-family: Arial, Helvetica, sans-serif;
-    font-size: 24px;
-    text-align: center;
     text-transform: capitalize;
 }
 :focus, .toggle-all:focus + label{
@@ -186,13 +185,32 @@ function onHashChange() {
 }
 .header{
     color: #cca3ff;
+    font-size: 20px;
+
 }
 .new-todo
 {
     padding: 16px;
-}
+    margin-left: 28px;
 
-.heading{
-  color:#cca3ff
+}
+.toggle:focus + label, .toggle-all:focus + label {
+  box-shadow: 0 0 1px 1px #ac87e7;
+}
+.toggle-all + label:before {
+  margin-right: 2px;
+}
+.filters li {
+    padding-top: 27px;
+    display: inline-block;
+}
+ .filters li a:hover, .filters li a.selected {
+    border-color:  green;
+}
+.todo-list li .destroy{
+    top: 16px;
+}
+.todo-list li .destroy:hover{
+    color: red;
 }
 </style>
